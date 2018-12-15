@@ -54,7 +54,7 @@ class App extends Component {
       sourceEl.hidden = true;
       // sourceEl.hidden = false;
       let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-      let droppableBelow = elemBelow.closest('#');
+      // let droppableBelow = elemBelow.closest('#');
       // console.log(droppableBelow);
     }
     // listener na ruch
