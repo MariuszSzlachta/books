@@ -1,10 +1,13 @@
-.lists {
+.books {
   position: relative;
   margin: 0 auto;
   display: flex;
   justify-content: center;
-  width: 100%;
-  min-height: 100vh;
+  align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  list-style: none;
   overflow: hidden;
 }

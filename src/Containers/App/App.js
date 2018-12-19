@@ -1,125 +1,150 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import store from '../../store';
-import { getData, increaseCounter, changePositions, resetCounter } from '../../actions/actions';
 import {connect} from 'react-redux';
+import { increaseCounter, changePositions, resetCounter, resetPositions, setData } from '../../actions/actions';
+import closestPollyfill from '../../Vendor/closest.pollyfill';
 
-import Lists from '../../Components/Lists/ListsContainer';
+import Books from '../../Components/Books/Books';
+import Counter from '../../Components/Counter/Counter';
+import Reset from '../../Components/Reset/Reset';
+import Spinner from '../../Components/Spinner/Spinner';
+
 import classes from './App.module.scss';
+
+
 class App extends Component {
   constructor(props){
     super(props);
     this.onDragHandler = this.onDragHandler.bind(this);
+    this.fetchDataHandler = this.fetchDataHandler.bind(this);
   }
+
+  fetchDataHandler() {
+    axios.get('https://anapioficeandfire.com/api/books/?page=1&pageSize=12')
+      .then(res => {
+        for (let i in res.data){
+          res.data[i].id = i;
+        }
+        store.dispatch(setData(res.data))
+      })
+      .catch(err => {
+        console.error(err);
+      })
+  }
+
   componentDidMount(){
-    store.dispatch(getData());
+    this.fetchDataHandler();
   }
 
   onDragHandler(event) {
-    // kopiuję sobie stan z propsów przekazych przez reduxa
-    let state = [...this.props.lists];
-    // nie chcę propagowania
+    // pollyfill for IE;
+    closestPollyfill();
+    // copy state from redux props
+    let state = [...this.props.list];
+    // dont't want to propagate events
     event.stopPropagation();
-    // odblokowany dostęp do DOM zwykłego
+    // unlock regular DOM properities
     event.persist()
 
-    // odnajduję element, który wywołał zdarzenie
+    // find element that called event
     let draggedEl = event.currentTarget;
-    // odnajduję indeks tego elementu w stanie aplikacji
+    // find index of dragged element in state
     let indexDraggedEl = state.findIndex(element => element.id === draggedEl.id ? element : null);
-    // odnajduję element w stanie aplikacji
-    let draggedElInState = state.filter(element => element.id === draggedEl.id ? element : null);
-    // wyciągam go z arraya
-    draggedElInState = draggedElInState[0];
-    // deklaruję zmienną opisująca indeks elementu w stanie aplikacji na który upuszczę przenoszony element
+    // prepare variable for index of an element on what I want to drop my dragged element
     let indexTargetEl = null;
-    // oraz zmienną w której go umieszczę
+    // and next variable, for target element itself
     let targetEl = null;
-    // oraz zmienną w której umieszczę element ze stanu
+    // and variable to localize target element in state of app
     let targetElInState = null;
-    // * ----------------
 
-    // funkcja będzie ustawiać left i right przeoszonego elementu względem pozycji myszki
+    // center pointer X when drag
+    let shiftX = event.clientX - draggedEl.getBoundingClientRect().left;
+    // function allows to set top and left css properities of dragged element
     function moveAt(pageX, pageY) {
-      draggedEl.style.left = pageX - 200  + 'px';
-      draggedEl.style.top = pageY - 50 + 'px';
+      draggedEl.style.left = pageX - shiftX  + 'px';
+      draggedEl.style.top = pageY - 500 + 'px';
     }
-    // funkcję wywoływać będę podczas poruszania myszką z wciśnietym lewym przyciskiem
+    // I gonna call this function when I drag my element
     function onMouseMove(event) {
-      // wywołuję funkcję zadeklarowaną powyżej
       moveAt(event.pageX, event.pageY);
-      // by top i left działały musze ustawić elementowi odpowiednie style
+      // I need to set this styles for element I want to drag. In other hand it won't work
+
       draggedEl.style.position = 'absolute';
       draggedEl.style.zIndex = 1000;
+      // draggedEl.style.transform = `translate3d(${event.pageX}, ${event.pageY}, 0)`;
     }
 
-    // funkcję będę wywoływać na zwolnienie lewego klawisza myszy
-    const stopMove = (event) => {
-      // usuwam listener od poruszania kursorem
+    // This function will be called when user leave the left mouse button
+    const drop = (event) => {
+      // remove event listener on mouse move
       document.removeEventListener('mousemove', onMouseMove);
-      // żeby znaleźć element nad którym trzymam element przenoszony musze zrobić taki myk
-      // elementowi przenoszonemu zmnieniam na czas próbkowania visibility na hidden
-      // potem próbkuję i spowrótem zmieniam na visible, bo przecież chcę widzieć mój przenoszony element
+      // To find element bellow my dragged element I need to do some hook
+      // change visibility of dragged element for a moment of probing
       draggedEl.style.visibility = 'hidden';
       let bellowEl = document.elementFromPoint(event.clientX, event.clientY);
       draggedEl.style.visibility = 'visible';
 
-      // jakbym upuścił element przenoszony na niczym to powstrzymuję
+      // if element bellow doesnt exist I want to stop
       if (!bellowEl) return;
-      // odnajduję element na który upuszczę przenoszony, musi być to element ul
-      targetEl = bellowEl.closest('ul');
-      // jakby element nie istniał to chcę by nie przenosiło elementu
+      // that's how I've found element <ul> bellow my element
+      targetEl = bellowEl.closest('li');
+      // this is hook that prevents from error with null as target elements. And when I drag my dragged element outside the window
       if (!targetEl) {
-        targetEl = draggedEl; 
+        targetEl = draggedEl;
       }
-      // znajduję indeks elementu (dalej zwanego targetem) na który upuszczam przenoszony element
+      // Find index of target element
       indexTargetEl = state.findIndex(element => element.id === targetEl.id ? element : null);
-      // znajduję target w stanie
-      targetElInState = state.filter(element => element.id === targetEl.id ? element : null);
-      // wyciągam target z arraya, bo target musi być obiektem nie tablicą. Analogicznie do kodu z poczatku skryptu z linijki 32
-      targetElInState = targetElInState[0];
+      // Find target element in state
+      [ targetElInState ] = state.filter(element => element.id === targetEl.id ? element : null);
 
-      // jeśli indeks istnieje i istnieje target w stanie
+      // before I dispatch action I need to check if my element are proper
       if (indexTargetEl !== null && targetElInState) {
-        // zmieniam przenoszonemu elementowi pozycję na static, by się ładnie układało
-        draggedEl.style.position = 'static'
-        // dispatchuję akcję która zamieni miejscami (indeksami) w reduxie elementy
+        // I want to have my elements well organized so I need to revert css position of dragged element. Otherwise will be mess
+        draggedEl.style.position = 'static';
+        draggedEl.style.zIndex = 0;
+        draggedEl.style.top = 0;
+        draggedEl.style.left = 0;
+        // let's dispatch action to change positions of elements in store
         store.dispatch(changePositions(indexDraggedEl, indexTargetEl))
-        // dispatchuję zwiększenie licznika o jeden
+        // and increase counter
         store.dispatch(increaseCounter());
       }
-      // po zwolnieniu klawisza nie potrzebuję już listenera
-      document.removeEventListener('mouseup', stopMove);
+      // When I leave left mouse button I don't need anymore listener
+      document.removeEventListener('mouseup', drop);
     }
-    // listenery na przyciśnięcie lewego klawisza oraz ruch kursorem
+    // set listeners for mouse move and leave left mouse button
     document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', stopMove);
-
-  }
-  geta(){
-    store.dispatch(getData());
+    document.addEventListener('mouseup', drop);
   }
 
-  resetCounterHandler() {
-    store.dispatch(resetCounter())
+  resetStateHandler() {
+    store.dispatch(resetPositions());
+    store.dispatch(resetCounter());
   }
+
   render() {
     return (
-      <div className={classes.App }>
-        <p>Counter: {this.props.counter}</p>
-        <Lists onDragHandler={this.onDragHandler}/>
-        <button onClick={this.geta}>data</button>
-        <button onClick={this.resetCounterHandler}>reset counter</button>
-
+      <div className={classes.app }>
+        <h1 className={classes.app__title}>List of books in the world of Westeros</h1>
+        <Counter />
+        <Reset
+          onReset={this.resetStateHandler}
+          isDisabled={this.props.list ? false : true}
+        >
+          Reset
+        </Reset>
+        {this.props.list ? <Books onDragHandler={this.onDragHandler}/> : <Spinner />}
       </div>
     );
-  }
-}
+  };
+};
 
 const mapStateToProps = state => {
-  const { lists, counter } = state.dndReducers;
+  const { list} = state.books;
   return {
-    lists,
-    counter
-  }
-}
+    list
+  };
+};
+
 export default connect(mapStateToProps)(App);

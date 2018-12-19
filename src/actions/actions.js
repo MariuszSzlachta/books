@@ -2,12 +2,12 @@ export const CHANGE_POSITIONS = 'CHANGE_POSITION';
 export const RESET_POSITIONS = 'RESET_POSITIONS';
 export const RESET_COUNTER = 'RESET_COUNTER';
 export const INCREASE_COUNTER = 'INCREASE_COUNTER';
+export const SET_DATA = 'SET_DATA';
 
-export const GET_DATA = 'GET_DATA';
-
-export function getData(){
+export function setData(data){
   return {
-    type: GET_DATA
+    type: SET_DATA,
+    data
   }
 }
 
