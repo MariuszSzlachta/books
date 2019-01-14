@@ -3,7 +3,7 @@
 
 Author: Mariusz Szlachta
 
-This App fetches data about George R.R. Martin's book in the world of Westeros. Renders data as components, elements of list and allows user to reorder them by drag and drop. In adition it shows counter that displays a number of switches and displays button to reset counter and to order books as they were ordered at the begining.
+This App fetches data about George R.R. Martin's book in the world of Westeros. Renders data as components, elements of list and allows user to reorder them by drag and drop. DnD mechanism is my own implementation this functionality without using HTML5 dnd api. In adition it shows counter that displays a number of switches and displays button to reset counter and to order books as they were ordered at the begining.
 
 ## Development
 
