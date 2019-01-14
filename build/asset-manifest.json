@@ -1,13 +1,13 @@
 {
-  "main.css": "/static/css/main.9143a47c.chunk.css",
-  "main.js": "/static/js/main.6148f0eb.chunk.js",
-  "main.js.map": "/static/js/main.6148f0eb.chunk.js.map",
-  "static/js/1.7cfa97ba.chunk.js": "/static/js/1.7cfa97ba.chunk.js",
-  "static/js/1.7cfa97ba.chunk.js.map": "/static/js/1.7cfa97ba.chunk.js.map",
-  "runtime~main.js": "/static/js/runtime~main.229c360f.js",
-  "runtime~main.js.map": "/static/js/runtime~main.229c360f.js.map",
-  "static/css/main.9143a47c.chunk.css.map": "/static/css/main.9143a47c.chunk.css.map",
-  "index.html": "/index.html",
-  "precache-manifest.e2e66af8477f0ccfa10d3deb6cb94d3a.js": "/precache-manifest.e2e66af8477f0ccfa10d3deb6cb94d3a.js",
-  "service-worker.js": "/service-worker.js"
+  "main.css": "/Books-dnd/static/css/main.9143a47c.chunk.css",
+  "main.js": "/Books-dnd/static/js/main.4131996b.chunk.js",
+  "main.js.map": "/Books-dnd/static/js/main.4131996b.chunk.js.map",
+  "static/js/1.7cfa97ba.chunk.js": "/Books-dnd/static/js/1.7cfa97ba.chunk.js",
+  "static/js/1.7cfa97ba.chunk.js.map": "/Books-dnd/static/js/1.7cfa97ba.chunk.js.map",
+  "runtime~main.js": "/Books-dnd/static/js/runtime~main.aee60a2c.js",
+  "runtime~main.js.map": "/Books-dnd/static/js/runtime~main.aee60a2c.js.map",
+  "static/css/main.9143a47c.chunk.css.map": "/Books-dnd/static/css/main.9143a47c.chunk.css.map",
+  "index.html": "/Books-dnd/index.html",
+  "precache-manifest.6614f90cd178af25017a67a039b5fb01.js": "/Books-dnd/precache-manifest.6614f90cd178af25017a67a039b5fb01.js",
+  "service-worker.js": "/Books-dnd/service-worker.js"
 }
